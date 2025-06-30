@@ -1,0 +1,53 @@
+#include <stdio.h>
+
+int G[4][7] = {
+    {1, 0, 0, 0, 1, 1, 0},
+    {0, 1, 0, 0, 1, 0, 1},
+    {0, 0, 1, 0, 0, 1, 1},
+    {0, 0, 0, 1, 1, 1, 1}
+};
+
+int H[3][7] = {
+    {1, 1, 0, 1, 1, 0, 0},
+    {1, 0, 1, 1, 0, 1, 0},
+    {0, 1, 1, 1, 0, 0, 1}
+};
+
+int main() {
+    int data[4], encoded[7] = {0}, received[7], syndrome[3] = {0};
+    int i, j, error_pos = -1;
+
+    printf("Enter 4 data bits: ");
+    for (i = 0; i < 4; i++) scanf("%d", &data[i]);
+
+    for (i = 0; i < 7; i++)
+        for (j = 0; j < 4; j++)
+            encoded[i] ^= data[j] * G[j][i];
+
+    printf("Encoded bits: ");
+    for (i = 0; i < 7; i++) printf("%d", encoded[i]);
+    printf("\n");
+
+    printf("Enter received 7 bits: ");
+    for (i = 0; i < 7; i++) scanf("%d", &received[i]);
+
+    for (i = 0; i < 3; i++)
+        for (j = 0; j < 7; j++)
+            syndrome[i] ^= received[j] * H[i][j];
+
+    error_pos = syndrome[0]*1 + syndrome[1]*2 + syndrome[2]*4;
+
+    if (error_pos == 0) {
+        printf("No error detected.\n");
+    } else {
+        printf("Error at bit position %d. Correcting...\n", error_pos);
+        received[error_pos - 1] ^= 1;
+    }
+
+    printf("Corrected codeword: ");
+    for (i = 0; i < 7; i++) printf("%d", received[i]);
+
+    printf("\nExtracted data: %d%d%d%d\n", received[0], received[1], received[2], received[3]);
+
+    return 0;
+}
