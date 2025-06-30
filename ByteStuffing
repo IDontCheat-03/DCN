@@ -1,0 +1,52 @@
+#include <stdio.h>
+#include <string.h>
+
+#define DLE 16
+#define STX 2
+#define ETX 3
+
+int main() {
+    char input[100];
+    char stuffed[200];
+    int i, j = 0;
+
+    printf("Enter your data (plain text):\n");
+    fgets(input, sizeof(input), stdin);
+
+    size_t len = strlen(input);
+    if (len > 0 && input[len-1] == '\n')
+        input[len-1] = '\0';
+
+    stuffed[j++] = DLE;
+    stuffed[j++] = STX;
+
+    for (i = 0; input[i] != '\0'; i++) {
+        if ((unsigned char)input[i] == DLE) {
+            stuffed[j++] = DLE;
+        }
+        stuffed[j++] = input[i];
+    }
+
+    stuffed[j++] = DLE;
+    stuffed[j++] = ETX;
+    stuffed[j] = '\0';
+
+    printf("\nStuffed data (hex values):\n");
+    for (i = 0; i < j; i++) {
+        printf("%02X ", (unsigned char)stuffed[i]);
+    }
+    printf("\n");
+
+    printf("\nDestuffed data:\n");
+    for (i = 2; i < j - 2; i++) {
+        if ((unsigned char)stuffed[i] == DLE && (unsigned char)stuffed[i+1] == DLE) {
+            printf("%c", DLE);
+            i++;
+        } else {
+            printf("%c", stuffed[i]);
+        }
+    }
+    printf("\n");
+
+    return 0;
+}
