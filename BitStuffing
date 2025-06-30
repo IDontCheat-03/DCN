@@ -1,0 +1,56 @@
+#include <stdio.h>
+#include <string.h>
+
+int main() {
+    char ch, array[50] = "01111110";  // Initialize with start flag
+    char recd_array[50];
+    int counter = 0, i = 8;  // Start after initial flag
+
+    printf("Enter the original data stream (0s and 1s only):\n");
+    
+    // Read data until Enter pressed
+    while((ch = getchar()) != '\n') {
+        if(ch == '1') {
+            counter++;
+        } else {
+            counter = 0;
+        }
+        
+        array[i++] = ch;  // Store character
+        
+        // Insert stuffing bit after 5 consecutive 1s
+        if(counter == 5) {
+            array[i++] = '0';
+            counter = 0;
+        }
+    }
+    
+    strcat(array, "01111110");  // Append end flag
+    printf("\nStuffed data: %s\n", array);
+    
+    // Destuffing process
+    counter = 0;
+    int k = 0;
+    printf("Destuffed data: ");
+    
+    // Process between flags (index 8 to end-8)
+    for(int j = 8; j < strlen(array) - 8; j++) {
+        if(array[j] == '1') {
+            counter++;
+        } else {
+            counter = 0;
+        }
+        
+        recd_array[k++] = array[j];
+        
+        // Remove stuffing bit (5 ones followed by 0)
+        if(counter == 5 && array[j+1] == '0') {
+            j++;  // Skip the stuffed 0
+            counter = 0;
+        }
+    }
+    recd_array[k] = '\0';  // Terminate string
+    printf("%s\n", recd_array);
+    
+    return 0;
+}
